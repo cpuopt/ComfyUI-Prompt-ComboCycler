@@ -16,6 +16,7 @@ from .matrix import (
 
 
 WEB_DIRECTORY = "./web"
+FIXED_RANDOM_SEED = 0
 
 
 class AnyPromptMatrixSourceDict(dict):
@@ -45,12 +46,11 @@ def _natural_source_key(name: str) -> tuple[str, int, str]:
     return (name, 0, name)
 
 
-def _source_payload_signature(sources: list[MatrixSource], traversal: str, seed: int, join_separator: str) -> str:
+def _source_payload_signature(sources: list[MatrixSource], traversal: str, join_separator: str) -> str:
     return json.dumps(
         {
             "sources": [source.to_payload() for source in sources],
             "traversal": traversal,
-            "seed": int(seed),
             "join_separator": join_separator,
         },
         ensure_ascii=False,
@@ -114,7 +114,6 @@ class PromptMatrixController:
         return {
             "required": {
                 "traversal": (["random_with_repeat", "sequential", "shuffle_no_repeat"], {"default": "random_with_repeat"}),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFFFFFFFF, "step": 1}),
                 "join_separator": ("STRING", {"default": ", "}),
             },
             "optional": AnyPromptMatrixSourceDict(),
@@ -136,7 +135,7 @@ class PromptMatrixController:
     def IS_CHANGED(cls, **kwargs: Any) -> int:
         return time.time_ns()
 
-    def compose(self, traversal: str, seed: int, join_separator: str, unique_id: str | None = None, **kwargs: Any) -> dict:
+    def compose(self, traversal: str, join_separator: str, unique_id: str | None = None, **kwargs: Any) -> dict:
         sources = _extract_sources(kwargs)
         counts = [source.count for source in sources if source.enabled]
         total = 1
@@ -144,7 +143,8 @@ class PromptMatrixController:
             total *= max(1, int(count))
 
         node_key = str(unique_id or "__default__")
-        signature = _source_payload_signature(sources, traversal, seed, join_separator)
+        signature = _source_payload_signature(sources, traversal, join_separator)
+        seed = FIXED_RANDOM_SEED
 
         with _STATE_LOCK:
             state = _CONTROLLER_STATE.setdefault(node_key, {"cursor": 0, "signature": signature})

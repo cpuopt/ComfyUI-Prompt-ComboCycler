@@ -76,14 +76,18 @@ class NodeBehaviorTests(unittest.TestCase):
         self.assertEqual(payload["items"], ["a", "b", "c"])
         self.assertEqual(result["ui"]["status"][0], "3 possible")
 
+    def test_controller_input_types_do_not_expose_seed(self):
+        input_types = PromptMatrixController.INPUT_TYPES()
+        self.assertNotIn("seed", input_types["required"])
+
     def test_controller_sequential_steps_and_composes(self):
         source_a = PromptMatrixSource().build("a\nb", "combination", 1, ", ", True)["result"][0]
         source_b = PromptMatrixSource().build("x\ny", "combination", 1, ", ", True)["result"][0]
         controller = PromptMatrixController()
 
-        first = controller.compose("sequential", 0, " | ", unique_id="node-a", source_1=source_a, source_2=source_b)
-        second = controller.compose("sequential", 0, " | ", unique_id="node-a", source_1=source_a, source_2=source_b)
-        third = controller.compose("sequential", 0, " | ", unique_id="node-a", source_1=source_a, source_2=source_b)
+        first = controller.compose("sequential", " | ", unique_id="node-a", source_1=source_a, source_2=source_b)
+        second = controller.compose("sequential", " | ", unique_id="node-a", source_1=source_a, source_2=source_b)
+        third = controller.compose("sequential", " | ", unique_id="node-a", source_1=source_a, source_2=source_b)
 
         self.assertEqual(first["result"], ("a | x", 1, 4))
         self.assertEqual(second["result"], ("a | y", 2, 4))
@@ -94,12 +98,12 @@ class NodeBehaviorTests(unittest.TestCase):
         controller = PromptMatrixController()
 
         sequence_a = [
-            controller.compose("random_with_repeat", 123, ", ", unique_id="node-r", source_1=source)["result"]
+            controller.compose("random_with_repeat", ", ", unique_id="node-r", source_1=source)["result"]
             for _ in range(5)
         ]
         _reset_controller_state("node-r")
         sequence_b = [
-            controller.compose("random_with_repeat", 123, ", ", unique_id="node-r", source_1=source)["result"]
+            controller.compose("random_with_repeat", ", ", unique_id="node-r", source_1=source)["result"]
             for _ in range(5)
         ]
 
