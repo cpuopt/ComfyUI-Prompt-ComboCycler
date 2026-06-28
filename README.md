@@ -1,4 +1,4 @@
-# ComfyUI-Prompt-Matrix
+# ComfyUI-Prompt-ComboCycler
 
 Prompt Matrix custom nodes for ComfyUI.
 
@@ -22,7 +22,7 @@ The plugin focuses on one concept: a composed `prompt` string.
 
 ## Install
 
-Copy `ComfyUI-Prompt-Matrix` into `ComfyUI/custom_nodes`, then restart ComfyUI.
+Copy `ComfyUI-Prompt-ComboCycler` into `ComfyUI/custom_nodes`, then restart ComfyUI.
 
 ## Tests
 

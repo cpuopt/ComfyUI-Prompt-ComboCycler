@@ -112,7 +112,7 @@ async function resetCursor(node) {
 }
 
 app.registerExtension({
-  name: "ComfyUI.PromptMatrix",
+  name: "ComfyUI-Prompt-ComboCycler",
   async beforeRegisterNodeDef(nodeType, nodeData) {
     if (nodeData.name === SOURCE_NODE) {
       const onNodeCreated = nodeType.prototype.onNodeCreated;
